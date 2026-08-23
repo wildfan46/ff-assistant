@@ -44,9 +44,9 @@ jobs:
       - name: Deploy
         run: >
           sam deploy
-          --stack-name ${{ secrets.SAM_STACK_NAME }}
-          --s3-bucket ${{ secrets.SAM_BUCKET }}
-          --role-arn ${{ secrets.SAM_POLICY_ARN }}
-          --parameter-overrides DatabaseUrl=${{ secrets.DATABASE_URL }}
+          --stack-name "${{ secrets.SAM_STACK_NAME }}"
+          --s3-bucket "${{ secrets.SAM_BUCKET }}"
+          --role-arn "${{ secrets.SAM_EXECUTION_ROLE_ARN }}"
+          --parameter-overrides "DatabaseUrl=${{ secrets.DATABASE_URL }}"
           --no-confirm-changeset
           --capabilities CAPABILITY_IAM

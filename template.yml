@@ -1,0 +1,56 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: CI/CD-managed Lambda
+
+Parameters:
+  DatabaseUrl:
+    Type: String
+    NoEcho: true
+    Description: >
+      Neon Postgres connection string, injected via --parameter-overrides
+      from a GitHub Actions secret. Never committed to this template.
+      Use the POOLED connection string (hostname has a "-pooler" segment),
+      not the direct one - each Lambda invocation opens a fresh connection,
+      and the direct endpoint's max_connections can be exhausted by a burst
+      of concurrent invocations (e.g. many users hitting this during a draft).
+
+Globals:
+  Function:
+    Runtime: provided.al2023
+    MemorySize: 128
+    Timeout: 10
+    Architectures: [arm64]
+    Tags:
+      Project: ff-assistant
+      ManagedBy: sam
+
+Resources:
+  GetPlayersFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: ff-assistant-get-players
+      CodeUri: ./
+      Handler: bootstrap
+      Description: Returns fantasy football player data from Neon Postgres
+      Environment:
+        Variables:
+          DATABASE_URL: !Ref DatabaseUrl
+      Policies:
+        - AWSLambdaBasicExecutionRole
+      FunctionUrlConfig:
+        AuthType: NONE
+    Metadata:
+      BuildMethod: go1.x
+
+  GetPlayersFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${GetPlayersFunction}
+      RetentionInDays: 14
+
+Outputs:
+  GetPlayersFunctionUrl:
+    Description: Direct HTTPS invoke URL for the get-players function
+    Value: !GetAtt GetPlayersFunctionUrl.FunctionUrl
+  GetPlayersFunctionName:
+    Value: !Ref GetPlayersFunction

@@ -20,9 +20,6 @@ Globals:
     MemorySize: 128
     Timeout: 10
     Architectures: [arm64]
-    Tags:
-      Project: ff-assistant
-      ManagedBy: sam
 
 Resources:
   AppFunction:

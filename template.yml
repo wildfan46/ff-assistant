@@ -25,13 +25,13 @@ Globals:
       ManagedBy: sam
 
 Resources:
-  GetPlayersFunction:
+  AppFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: ff-assistant-get-players
+      FunctionName: ff-assistant
       CodeUri: ./
       Handler: bootstrap
-      Description: Returns fantasy football player data from Neon Postgres
+      Description: ff-assistant backend - fantasy football API, single Lambda handling multiple routes
       Environment:
         Variables:
           DATABASE_URL: !Ref DatabaseUrl
@@ -42,15 +42,15 @@ Resources:
     Metadata:
       BuildMethod: go1.x
 
-  GetPlayersFunctionLogGroup:
+  AppFunctionLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub /aws/lambda/${GetPlayersFunction}
+      LogGroupName: !Sub /aws/lambda/${AppFunction}
       RetentionInDays: 14
 
 Outputs:
-  GetPlayersFunctionUrl:
-    Description: Direct HTTPS invoke URL for the get-players function
-    Value: !GetAtt GetPlayersFunctionUrl.FunctionUrl
-  GetPlayersFunctionName:
-    Value: !Ref GetPlayersFunction
+  AppFunctionUrl:
+    Description: Direct HTTPS invoke URL for the ff-assistant function
+    Value: !GetAtt AppFunctionUrl.FunctionUrl
+  AppFunctionName:
+    Value: !Ref AppFunction

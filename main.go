@@ -48,7 +48,7 @@ func getDB(ctx context.Context) (*sql.DB, error) {
 }
 
 func fetchConnectionString(ctx context.Context) (string, error) {
-	paramName := envOrPanic("DB_SSM_PARAM")
+	paramName := envOrPanic("DATABASE_URL")
 
 	cfg, err := config.LoadDefaultConfig(ctx)
 	if err != nil {

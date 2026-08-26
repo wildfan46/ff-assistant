@@ -48,9 +48,40 @@ Resources:
       LogGroupName: !Sub /aws/lambda/${AppFunction}
       RetentionInDays: 14
 
+  PlayerSyncFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: ff-assistant-player-sync
+      CodeUri: cmd/player-sync/
+      Handler: bootstrap
+      Description: >
+        Daily job: fetches the player list from Sleeper and upserts into
+        players. Currently a hello-world stub - fetch/upsert/notify logic
+        not yet implemented.
+      Policies:
+        - AWSLambdaBasicExecutionRole
+      Events:
+        DailySync:
+          Type: Schedule
+          Properties:
+            Schedule: cron(0 13 * * ? *)
+            Name: ff-assistant-player-sync-daily
+            Description: Triggers the daily Sleeper player sync
+            Enabled: true
+    Metadata:
+      BuildMethod: go1.x
+
+  PlayerSyncFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${PlayerSyncFunction}
+      RetentionInDays: 14
+
 Outputs:
   AppFunctionUrl:
     Description: Direct HTTPS invoke URL for the ff-assistant function
     Value: !GetAtt AppFunctionUrl.FunctionUrl
   AppFunctionName:
     Value: !Ref AppFunction
+  PlayerSyncFunctionName:
+    Value: !Ref PlayerSyncFunction
